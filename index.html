@@ -52,19 +52,13 @@
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        @media (min-width: 640px) {
-            body {
-                background-color: #E8ECEF;
-                background-image: radial-gradient(circle at 15% 15%, rgba(18, 154, 195, 0.14), transparent 40%),
-                                  radial-gradient(circle at 85% 85%, rgba(11, 25, 44, 0.12), transparent 45%);
-            }
-        }
+
     </style>
 </head>
-<body class="bg-ivory text-navy font-sans antialiased selection:bg-cyanbrand selection:text-white flex items-center justify-center min-h-screen sm:p-4">
+<body class="bg-ivory text-navy font-sans antialiased selection:bg-cyanbrand selection:text-white min-h-screen">
 
     <!-- حاوية التطبيق الرئيسية -->
-    <div id="phone-container" class="relative w-full sm:w-[430px] h-[100dvh] sm:h-[860px] bg-ivory sm:rounded-[2.8rem] sm:border-[9px] sm:border-navy shadow-2xl overflow-hidden flex flex-col transition-all duration-300">
+    <div id="phone-container" class="relative w-full h-[100dvh] bg-ivory overflow-hidden flex flex-col">
 
         <!-- ==================== شاشة البداية (Splash Screen) ==================== -->
         <div id="splash-screen" class="absolute inset-0 z-50 bg-ivory flex flex-col items-center justify-between p-8 text-center transition-opacity duration-500">
@@ -104,18 +98,6 @@
             </div>
         </div>
 
-        <!-- شريط الحالة العلوي -->
-        <div class="hidden sm:flex justify-between items-center px-6 pt-2.5 pb-1 text-xs font-bold text-navy/70 select-none bg-white">
-            <span id="status-bar-clock">08:00</span>
-            <div class="w-24 h-5 bg-navy rounded-full mx-auto"></div>
-            <div class="flex items-center gap-1.5">
-                <span class="text-[10px] text-cyanbrand font-extrabold">LIVE</span>
-                <div class="w-5 h-2.5 border border-navy rounded-sm p-0.5 flex items-center">
-                    <div class="w-full h-full bg-navy rounded-[1px]"></div>
-                </div>
-            </div>
-        </div>
-
         <!-- ==================== الهيدر العلوي للتطبيق ==================== -->
         <header class="px-5 py-3 bg-white border-b border-slate-200/70 flex items-center justify-between z-20 shrink-0">
             <div onclick="switchTab('home')" class="flex items-center gap-2.5 cursor-pointer">
@@ -139,11 +121,6 @@
                 <!-- زر اختبار التنبيه التلقائي checkDue -->
                 <button onclick="simulateDueAlert()" title="محاكاة وصول موعد الآن (checkDue)" class="px-2.5 py-2 rounded-xl bg-cyanbrand-light hover:bg-cyanbrand/20 text-cyanbrand text-[11px] font-extrabold transition active:scale-95">
                     🔔 اختبار التنبيه
-                </button>
-                <button onclick="toggleFullView()" title="تبديل عرض سطح المكتب" class="hidden sm:flex p-2 rounded-xl bg-ivory hover:bg-slate-200/70 text-navy transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-                    </svg>
                 </button>
             </div>
         </header>
