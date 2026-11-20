@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>hos date - نظام إدارة حجوزات المستشفى</title>
     <!-- خط Cairo العربي -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,7 +61,7 @@
     <div id="phone-container" class="relative w-full h-[100dvh] bg-ivory overflow-hidden flex flex-col">
 
         <!-- ==================== شاشة البداية (Splash Screen) ==================== -->
-        <div id="splash-screen" class="absolute inset-0 z-50 bg-ivory flex flex-col items-center justify-between p-8 text-center transition-opacity duration-500">
+        <div id="splash-screen" class="fixed inset-0 z-50 bg-ivory flex flex-col items-center justify-between p-8 text-center transition-opacity duration-500">
             <div class="w-full flex justify-end pt-2">
                 <button onclick="enterApp()" class="text-xs font-bold text-slate-400 hover:text-navy transition">تخطي</button>
             </div>
@@ -126,7 +126,7 @@
         </header>
 
         <!-- ==================== منطقة المحتوى الرئيسية ==================== -->
-        <main id="main-scroll" class="flex-1 overflow-y-auto no-scrollbar pb-24">
+        <main id="main-scroll" class="flex-1 overflow-y-auto no-scrollbar pb-28">
 
             <!-- 1. التبويب الرئيسي (لوحة التحكم والعد التنازلي) -->
             <section id="view-home" class="tab-view px-5 pt-4 space-y-5">
@@ -286,7 +286,7 @@
         </main>
 
         <!-- ==================== شريط التنقل السفلي ==================== -->
-        <nav class="absolute bottom-0 inset-x-0 bg-white border-t border-slate-200/80 px-2 py-2 flex items-center justify-around z-30 shadow-[0_-4px_20px_rgba(11,25,44,0.04)]">
+        <nav class="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200/80 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] flex items-center justify-around z-30 shadow-[0_-4px_20px_rgba(11,25,44,0.04)]">
             <button onclick="switchTab('home')" data-nav="home" class="nav-item active flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl text-cyanbrand transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -324,7 +324,7 @@
         </nav>
 
         <!-- ==================== 1. نافذة حجز موعد جديد (bookAppointment) ==================== -->
-        <div id="booking-modal" class="hidden absolute inset-0 z-40 bg-navy/65 backdrop-blur-xs flex flex-col justify-end sm:justify-center sm:p-4">
+        <div id="booking-modal" class="hidden fixed inset-0 z-40 bg-navy/65 backdrop-blur-xs flex flex-col justify-end sm:justify-center sm:p-4">
             <div class="bg-ivory w-full max-h-[94%] rounded-t-3xl sm:rounded-3xl flex flex-col overflow-hidden shadow-2xl tab-view">
                 <div class="px-5 py-4 bg-white border-b border-slate-200/80 flex items-center justify-between shrink-0">
                     <div>
@@ -400,7 +400,7 @@
         </div>
 
         <!-- ==================== 2. نافذة تأجيل الموعد (reschedule في C++) ==================== -->
-        <div id="reschedule-modal" class="hidden absolute inset-0 z-40 bg-navy/65 backdrop-blur-xs flex items-center justify-center p-5">
+        <div id="reschedule-modal" class="hidden fixed inset-0 z-40 bg-navy/65 backdrop-blur-xs flex items-center justify-center p-5">
             <div class="bg-white w-full rounded-3xl p-5 shadow-2xl border border-slate-200 space-y-4 tab-view">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                     <div>
@@ -430,14 +430,14 @@
         </div>
 
         <!-- ==================== 3. شاشة تأكيد الحجز والتذكرة (Confirmation + QR) ==================== -->
-        <div id="ticket-modal" class="hidden absolute inset-0 z-50 bg-navy/70 backdrop-blur-xs flex items-center justify-center p-5">
+        <div id="ticket-modal" class="hidden fixed inset-0 z-50 bg-navy/70 backdrop-blur-xs flex items-center justify-center p-5">
             <div id="ticket-modal-body" class="bg-white w-full rounded-3xl overflow-hidden shadow-2xl border border-slate-200 tab-view">
                 <!-- يتم التعبئة ديناميكياً -->
             </div>
         </div>
 
         <!-- ==================== 4. نافذة التنبيه التلقائي عند وصول الموعد (checkDue في C++) ==================== -->
-        <div id="due-alert-modal" class="hidden absolute inset-0 z-50 bg-navy/80 backdrop-blur-xs flex items-center justify-center p-5">
+        <div id="due-alert-modal" class="hidden fixed inset-0 z-50 bg-navy/80 backdrop-blur-xs flex items-center justify-center p-5">
             <div class="bg-white w-full rounded-3xl overflow-hidden shadow-2xl border-2 border-cyanbrand tab-view">
                 <div class="bg-navy text-white p-4 text-center">
                     <span class="inline-block px-3 py-1 rounded-full bg-cyanbrand text-white text-[11px] font-extrabold animate-bounce mb-1">
@@ -452,7 +452,7 @@
         </div>
 
         <!-- ==================== 5. نافذة تأكيد الإلغاء (بديل confirm) ==================== -->
-        <div id="cancel-confirm-modal" class="hidden absolute inset-0 z-50 bg-navy/70 backdrop-blur-xs flex items-center justify-center p-5">
+        <div id="cancel-confirm-modal" class="hidden fixed inset-0 z-50 bg-navy/70 backdrop-blur-xs flex items-center justify-center p-5">
             <div class="bg-white w-full rounded-3xl p-5 shadow-2xl border border-slate-200 text-center space-y-4 tab-view">
                 <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl mx-auto">⚠️</div>
                 <div>
@@ -471,7 +471,7 @@
         </div>
 
         <!-- إشعار منبثق (Toast) -->
-        <div id="toast" class="pointer-events-none opacity-0 transition-all duration-300 absolute bottom-24 left-1/2 -translate-x-1/2 bg-navy text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-xl border border-white/10 whitespace-nowrap z-50">
+        <div id="toast" class="pointer-events-none opacity-0 transition-all duration-300 fixed bottom-24 left-1/2 -translate-x-1/2 bg-navy text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-xl border border-white/10 whitespace-nowrap z-50">
             تمت العملية بنجاح
         </div>
 
