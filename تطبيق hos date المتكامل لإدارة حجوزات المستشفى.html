@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>hos date - نظام إدارة حجوزات المستشفى</title>
+    <!-- خط Cairo العربي -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            DEFAULT: '#0B192C',
+                            light: '#162A45',
+                            dark: '#060E1A',
+                        },
+                        cyanbrand: {
+                            DEFAULT: '#129AC3',
+                            light: '#E6F5FA',
+                            dark: '#0D7A9C',
+                        },
+                        ivory: {
+                            DEFAULT: '#F7F7F5',
+                            dark: '#EDEDEA',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .tab-view {
+            animation: fadeSlideUp 0.25s ease-out;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (min-width: 640px) {
+            body {
+                background-color: #E8ECEF;
+                background-image: radial-gradient(circle at 15% 15%, rgba(18, 154, 195, 0.14), transparent 40%),
+                                  radial-gradient(circle at 85% 85%, rgba(11, 25, 44, 0.12), transparent 45%);
+            }
+        }
+    </style>
+</head>
+<body class="bg-ivory text-navy font-sans antialiased selection:bg-cyanbrand selection:text-white flex items-center justify-center min-h-screen sm:p-4">
+
+    <!-- حاوية التطبيق الرئيسية -->
+    <div id="phone-container" class="relative w-full sm:w-[430px] h-[100dvh] sm:h-[860px] bg-ivory sm:rounded-[2.8rem] sm:border-[9px] sm:border-navy shadow-2xl overflow-hidden flex flex-col transition-all duration-300">
+
+        <!-- ==================== شاشة البداية (Splash Screen) ==================== -->
+        <div id="splash-screen" class="absolute inset-0 z-50 bg-ivory flex flex-col items-center justify-between p-8 text-center transition-opacity duration-500">
+            <div class="w-full flex justify-end pt-2">
+                <button onclick="enterApp()" class="text-xs font-bold text-slate-400 hover:text-navy transition">تخطي</button>
+            </div>
+
+            <!-- شعار hos date -->
+            <div class="flex flex-col items-center my-auto">
+                <div class="w-36 h-36 mb-4 flex items-center justify-center">
+                    <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M74 34C74 26.268 80.268 20 88 20H112C119.732 20 126 26.268 126 34V74H166C173.732 74 180 80.268 180 88V112C180 119.732 173.732 126 166 126H126V166C126 173.732 119.732 180 112 180H88C80.268 180 74 173.732 74 166V126H34C26.268 126 20 119.732 20 112V88C20 80.268 26.268 74 34 74H74V34Z" stroke="#0B192C" stroke-width="11" stroke-linejoin="round"/>
+                        <path d="M56 125C82 125 96 78 134 78H166" stroke="#0B192C" stroke-width="10" stroke-linecap="round"/>
+                        <path d="M126 98L142 114L184 68" stroke="#F7F7F5" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" opacity="0.25"/>
+                        <path d="M126 98L142 114L184 68" stroke="#0B192C" stroke-width="10.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+
+                <div dir="ltr" class="flex items-baseline justify-center gap-1.5 text-5xl font-extrabold tracking-tight">
+                    <span class="text-navy">hos</span>
+                    <span class="text-cyanbrand">date</span>
+                </div>
+                <p dir="ltr" class="text-[11px] font-bold tracking-[0.28em] text-navy/80 mt-2 uppercase">
+                    HOSPITAL APPOINTMENT
+                </p>
+
+                <p class="mt-6 text-sm text-slate-600 max-w-[280px] leading-relaxed">
+                    نظام إدارة حجوزات المستشفى الذكي: حجز فوري، منع تعارض المواعيد، عد تنازلي مباشر، وتنبيهات تلقائية.
+                </p>
+            </div>
+
+            <div class="w-full space-y-3 pb-4">
+                <button onclick="enterApp()" class="w-full py-4 rounded-2xl bg-navy hover:bg-navy-light text-white font-bold text-base shadow-lg shadow-navy/20 active:scale-[0.98] transition flex items-center justify-center gap-2">
+                    <span>الدخول إلى النظام</span>
+                    <svg class="w-5 h-5 rotate-180" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- شريط الحالة العلوي -->
+        <div class="hidden sm:flex justify-between items-center px-6 pt-2.5 pb-1 text-xs font-bold text-navy/70 select-none bg-white">
+            <span id="status-bar-clock">08:00</span>
+            <div class="w-24 h-5 bg-navy rounded-full mx-auto"></div>
+            <div class="flex items-center gap-1.5">
+                <span class="text-[10px] text-cyanbrand font-extrabold">LIVE</span>
+                <div class="w-5 h-2.5 border border-navy rounded-sm p-0.5 flex items-center">
+                    <div class="w-full h-full bg-navy rounded-[1px]"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== الهيدر العلوي للتطبيق ==================== -->
+        <header class="px-5 py-3 bg-white border-b border-slate-200/70 flex items-center justify-between z-20 shrink-0">
+            <div onclick="switchTab('home')" class="flex items-center gap-2.5 cursor-pointer">
+                <div class="w-10 h-10 rounded-xl bg-ivory border border-slate-200/80 flex items-center justify-center p-1.5">
+                    <svg viewBox="0 0 200 200" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M74 34C74 26.268 80.268 20 88 20H112C119.732 20 126 26.268 126 34V74H166C173.732 74 180 80.268 180 88V112C180 119.732 173.732 126 166 126H126V166C126 173.732 119.732 180 112 180H88C80.268 180 74 173.732 74 166V126H34C26.268 126 20 119.732 20 112V88C20 80.268 26.268 74 34 74H74V34Z" stroke="#0B192C" stroke-width="14" stroke-linejoin="round"/>
+                        <path d="M56 125C82 125 96 78 134 78H166" stroke="#0B192C" stroke-width="12" stroke-linecap="round"/>
+                        <path d="M126 98L142 114L184 68" stroke="#129AC3" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="flex flex-col">
+                    <div dir="ltr" class="flex items-baseline gap-1 text-xl font-black leading-none">
+                        <span class="text-navy">hos</span>
+                        <span class="text-cyanbrand">date</span>
+                    </div>
+                    <span dir="ltr" class="text-[8px] font-bold tracking-[0.18em] text-slate-400 mt-0.5">HOSPITAL APPOINTMENT</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <!-- زر اختبار التنبيه التلقائي checkDue -->
+                <button onclick="simulateDueAlert()" title="محاكاة وصول موعد الآن (checkDue)" class="px-2.5 py-2 rounded-xl bg-cyanbrand-light hover:bg-cyanbrand/20 text-cyanbrand text-[11px] font-extrabold transition active:scale-95">
+                    🔔 اختبار التنبيه
+                </button>
+                <button onclick="toggleFullView()" title="تبديل عرض سطح المكتب" class="hidden sm:flex p-2 rounded-xl bg-ivory hover:bg-slate-200/70 text-navy transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- ==================== منطقة المحتوى الرئيسية ==================== -->
+        <main id="main-scroll" class="flex-1 overflow-y-auto no-scrollbar pb-24">
+
+            <!-- 1. التبويب الرئيسي (لوحة التحكم والعد التنازلي) -->
+            <section id="view-home" class="tab-view px-5 pt-4 space-y-5">
+
+                <!-- شريط معلومات الدوام -->
+                <div class="flex items-center justify-between bg-white px-4 py-2.5 rounded-2xl border border-slate-200/80 shadow-2xs">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-xs font-bold text-navy">الدوام: 08:00 - 20:00</span>
+                    </div>
+                    <span class="text-[11px] font-bold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-lg">الجمعة إجازة</span>
+                </div>
+
+                <!-- بطاقة الموعد القادم مع العد التنازلي المباشر (Live Countdown) -->
+                <div id="next-appointment-wrapper">
+                    <!-- يتم تعبئتها ديناميكياً عبر JS -->
+                </div>
+
+                <!-- أزرار العمليات السريعة (مطابقة لقائمة C++ الخمسة) -->
+                <div>
+                    <h3 class="text-xs font-extrabold text-slate-500 mb-2.5 px-1">عمليات النظام السريعة</h3>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button onclick="openBookingModal()" class="p-3.5 rounded-2xl bg-cyanbrand hover:bg-cyanbrand-dark text-white text-right shadow-md shadow-cyanbrand/20 transition active:scale-95 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg shrink-0">➕</div>
+                            <div>
+                                <span class="block text-xs font-extrabold">1. حجز موعد</span>
+                                <span class="block text-[10px] text-white/85">كشف / مراجعة / استشارة</span>
+                            </div>
+                        </button>
+
+                        <button onclick="switchTab('schedule')" class="p-3.5 rounded-2xl bg-white hover:border-cyanbrand border border-slate-200/80 text-navy text-right shadow-2xs transition active:scale-95 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-navy/5 text-navy flex items-center justify-center text-lg shrink-0">📅</div>
+                            <div>
+                                <span class="block text-xs font-extrabold">2. مواعيد يوم</span>
+                                <span class="block text-[10px] text-slate-500">جدول الأطباء اليومي</span>
+                            </div>
+                        </button>
+
+                        <button onclick="switchTab('appointments')" class="p-3.5 rounded-2xl bg-white hover:border-cyanbrand border border-slate-200/80 text-navy text-right shadow-2xs transition active:scale-95 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg shrink-0">⏱️</div>
+                            <div>
+                                <span class="block text-xs font-extrabold">3 & 4. تأجيل / إلغاء</span>
+                                <span class="block text-[10px] text-slate-500">تعديل كافة الحجوزات</span>
+                            </div>
+                        </button>
+
+                        <button onclick="switchTab('history')" class="p-3.5 rounded-2xl bg-white hover:border-cyanbrand border border-slate-200/80 text-navy text-right shadow-2xs transition active:scale-95 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-cyanbrand-light text-cyanbrand flex items-center justify-center text-lg shrink-0">📋</div>
+                            <div>
+                                <span class="block text-xs font-extrabold">5. سجل مريض</span>
+                                <span class="block text-[10px] text-slate-500">بحث برقم الجوال</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- قائمة أطباء المستشفى المعتمدين (من ملف C++) -->
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between px-1">
+                        <h3 class="text-sm font-extrabold text-navy">أطباء وأقسام المستشفى</h3>
+                        <span class="text-[11px] text-slate-500 font-bold">4 عيادات تخصصية</span>
+                    </div>
+                    <div id="doctors-cards-container" class="space-y-2.5">
+                        <!-- يتم توليد بطاقات الأطباء الأربعة عبر JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. تبويب جدول مواعيد يوم (listDay في C++) -->
+            <section id="view-schedule" class="tab-view hidden px-5 pt-4 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-navy">جدول مواعيد اليوم</h2>
+                        <p class="text-xs text-slate-500">عرض المواعيد مقسمة حسب كل طبيب وقسمه</p>
+                    </div>
+                    <button onclick="setScheduleToday()" class="px-3 py-1.5 rounded-xl bg-cyanbrand-light text-cyanbrand text-xs font-extrabold hover:bg-cyanbrand/20 transition">
+                        اليوم
+                    </button>
+                </div>
+
+                <!-- اختيار التاريخ -->
+                <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 flex items-center gap-3">
+                    <label for="schedule-date-input" class="text-xs font-extrabold text-navy whitespace-nowrap">اختر التاريخ:</label>
+                    <input type="date" id="schedule-date-input" onchange="renderDaySchedule()" class="flex-1 px-3 py-2 rounded-xl bg-ivory border border-slate-200 text-xs font-bold text-navy outline-none focus:border-cyanbrand">
+                </div>
+
+                <!-- تنبيه يوم الجمعة إذا تم اختياره -->
+                <div id="friday-banner" class="hidden p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-extrabold flex items-center gap-2.5">
+                    <span class="text-lg">🚫</span>
+                    <span>تنبيه: هذا اليوم يوافق يوم الجمعة (إجازة رسمية في المستشفى).</span>
+                </div>
+
+                <!-- قائمة المواعيد مقسمة حسب الطبيب -->
+                <div id="day-schedule-container" class="space-y-3">
+                    <!-- يتم التعبئة عبر JS -->
+                </div>
+            </section>
+
+            <!-- 3. تبويب إدارة جميع المواعيد (تأجيل / إلغاء / QR) -->
+            <section id="view-appointments" class="tab-view hidden px-5 pt-4 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-navy">إدارة الحجوزات</h2>
+                        <p class="text-xs text-slate-500">تأجيل، إلغاء، أو عرض تذكرة الموعد</p>
+                    </div>
+                    <button onclick="openBookingModal()" class="px-3.5 py-2 rounded-xl bg-cyanbrand hover:bg-cyanbrand-dark text-white text-xs font-bold shadow-sm active:scale-95 transition">
+                        + حجز جديد
+                    </button>
+                </div>
+
+                <!-- فلتر الحالة -->
+                <div class="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-white border border-slate-200/80">
+                    <button onclick="setAptFilter('upcoming', this)" class="apt-filter-btn py-2 rounded-xl text-xs font-bold bg-navy text-white transition">
+                        المواعيد القادمة
+                    </button>
+                    <button onclick="setAptFilter('all', this)" class="apt-filter-btn py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition">
+                        كافة السجل (<span id="total-bookings-badge">0</span>)
+                    </button>
+                </div>
+
+                <div id="all-appointments-list" class="space-y-3">
+                    <!-- يتم التعبئة عبر JS -->
+                </div>
+            </section>
+
+            <!-- 4. تبويب سجل المريض (patientHistory في C++) -->
+            <section id="view-history" class="tab-view hidden px-5 pt-4 space-y-4">
+                <div>
+                    <h2 class="text-lg font-extrabold text-navy">سجل زيارات المريض</h2>
+                    <p class="text-xs text-slate-500">ابحث برقم الجوال (10 أو 11 رقماً) لعرض جميع الزيارات</p>
+                </div>
+
+                <!-- مربع البحث برقم الجوال -->
+                <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-2xs space-y-3">
+                    <label class="block text-xs font-extrabold text-navy">رقم جوال المريض</label>
+                    <div class="flex gap-2">
+                        <input type="tel" id="history-phone-input" placeholder="مثال: 07701234567" dir="ltr"
+                            class="flex-1 px-4 py-2.5 rounded-xl bg-ivory border border-slate-200 text-sm font-bold text-navy outline-none focus:border-cyanbrand text-right">
+                        <button onclick="searchPatientHistory()" class="px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-light text-white text-xs font-extrabold transition active:scale-95">
+                            بحث
+                        </button>
+                    </div>
+                    <!-- أرقام سريعة للتجربة -->
+                    <div id="quick-phones-bar" class="flex flex-wrap gap-1.5 pt-1">
+                        <!-- يتم توليد أرقام المرضى المسجلين لتسهيل التجربة -->
+                    </div>
+                </div>
+
+                <!-- نتائج سجل المريض -->
+                <div id="patient-history-results" class="space-y-3">
+                    <div class="p-8 text-center rounded-3xl bg-white border border-slate-200/80 text-slate-400 text-xs font-bold">
+                        أدخل رقم الجوال أعلاه لعرض سجل الزيارات وعددها
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ==================== شريط التنقل السفلي ==================== -->
+        <nav class="absolute bottom-0 inset-x-0 bg-white border-t border-slate-200/80 px-2 py-2 flex items-center justify-around z-30 shadow-[0_-4px_20px_rgba(11,25,44,0.04)]">
+            <button onclick="switchTab('home')" data-nav="home" class="nav-item active flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl text-cyanbrand transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span class="text-[11px] font-bold">الرئيسية</span>
+            </button>
+
+            <button onclick="switchTab('schedule')" data-nav="schedule" class="nav-item flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl text-navy/60 hover:text-navy transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                <span class="text-[11px] font-bold">جدول اليوم</span>
+            </button>
+
+            <!-- زر الحجز المركزي -->
+            <button onclick="openBookingModal()" aria-label="حجز موعد" class="-mt-7 w-14 h-14 rounded-2xl bg-navy hover:bg-navy-light text-white border-4 border-ivory shadow-lg shadow-navy/25 flex items-center justify-center active:scale-95 transition">
+                <svg class="w-7 h-7 text-cyanbrand" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+            </button>
+
+            <button onclick="switchTab('appointments')" data-nav="appointments" class="nav-item flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl text-navy/60 hover:text-navy transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span class="text-[11px] font-bold">الحجوزات</span>
+            </button>
+
+            <button onclick="switchTab('history')" data-nav="history" class="nav-item flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl text-navy/60 hover:text-navy transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <span class="text-[11px] font-bold">سجل مريض</span>
+            </button>
+        </nav>
+
+        <!-- ==================== 1. نافذة حجز موعد جديد (bookAppointment) ==================== -->
+        <div id="booking-modal" class="hidden absolute inset-0 z-40 bg-navy/65 backdrop-blur-xs flex flex-col justify-end sm:justify-center sm:p-4">
+            <div class="bg-ivory w-full max-h-[94%] rounded-t-3xl sm:rounded-3xl flex flex-col overflow-hidden shadow-2xl tab-view">
+                <div class="px-5 py-4 bg-white border-b border-slate-200/80 flex items-center justify-between shrink-0">
+                    <div>
+                        <h3 class="text-base font-extrabold text-navy">حجز موعد طبي جديد</h3>
+                        <p class="text-[11px] text-slate-500">يتم فحص التعارض وساعات الدوام تلقائياً</p>
+                    </div>
+                    <button onclick="closeModal('booking-modal')" class="w-8 h-8 rounded-xl bg-ivory text-navy font-bold flex items-center justify-center hover:bg-slate-200">✕</button>
+                </div>
+
+                <form id="booking-form" onsubmit="handleBookSubmit(event)" class="p-5 overflow-y-auto no-scrollbar space-y-3.5">
+                    <!-- صندوق رسائل الخطأ والتحقق (بديل رسائل cout في C++) -->
+                    <div id="booking-error-box" class="hidden p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-extrabold leading-relaxed">
+                    </div>
+
+                    <!-- بيانات المريض -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-navy mb-1">اسم المريض *</label>
+                            <input type="text" id="book-patient" required placeholder="أدخل الاسم الكامل للمريض"
+                                class="w-full px-3.5 py-2.5 rounded-xl bg-ivory border border-slate-200 text-xs font-bold text-navy outline-none focus:border-cyanbrand">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-navy mb-1">رقم الجوال (10 أو 11 رقماً) *</label>
+                            <input type="tel" id="book-phone" required placeholder="07701234567" dir="ltr"
+                                class="w-full px-3.5 py-2.5 rounded-xl bg-ivory border border-slate-200 text-xs font-bold text-navy outline-none focus:border-cyanbrand text-right">
+                        </div>
+                    </div>
+
+                    <!-- اختيار الطبيب ونوع الزيارة -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-navy mb-1">اختر الطبيب والقسم *</label>
+                            <select id="book-doctor" class="w-full px-3 py-2.5 rounded-xl bg-ivory border border-slate-200 text-xs font-bold text-navy outline-none focus:border-cyanbrand">
+                                <!-- يتم التعبئة من DOCTORS -->
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-navy mb-1.5">نوع الزيارة (تحدد المدة تلقائياً) *</label>
+                            <div id="visit-types-grid" class="grid grid-cols-3 gap-2">
+                                <!-- كشف جديد (30د)، مراجعة (15د)، استشارة (20د) -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- التاريخ والوقت -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 space-y-3">
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-xs font-bold text-navy mb-1">التاريخ *</label>
+                                <input type="date" id="book-date" required onchange="updateCalculatedEndTime()"
+                                    class="w-full px-3 py-2.5 rounded-xl bg-ivory border border-slate-200 text-xs font-bold text-navy outline-none focus:border-cyanbrand">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-navy mb-1">وقت البدء *</label>
+                                <input type="time" id="book-time" required value="10:00" onchange="updateCalculatedEndTime()"
+                                    class="w-full px-3 py-2.5 rounded-xl bg-ivory border border-slate-200 text-xs font-bold text-navy outline-none focus:border-cyanbrand">
+                            </div>
+                        </div>
+
+                        <!-- معاينة وقت الانتهاء المحسوب -->
+                        <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-cyanbrand-light/70 border border-cyanbrand/20 text-xs">
+                            <span class="font-bold text-navy">فترة الموعد المحسوبة:</span>
+                            <span id="calculated-slot-preview" class="font-extrabold text-cyanbrand" dir="ltr">10:00 - 10:30 (30 دقيقة)</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 rounded-2xl bg-cyanbrand hover:bg-cyanbrand-dark text-white font-extrabold text-sm shadow-lg shadow-cyanbrand/25 active:scale-[0.98] transition">
+                        تأكيد الحجز وفحص التوفر
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== 2. نافذة تأجيل الموعد (reschedule في C++) ==================== -->
+        <div id="reschedule-modal" class="hidden absolute inset-0 z-40 bg-navy/65 backdrop-blur-xs flex items-center justify-center p-5">
+            <div class="bg-white w-full rounded-3xl p-5 shadow-2xl border border-slate-200 space-y-4 tab-view">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                        <h3 class="text-base font-extrabold text-navy">تأجيل الموعد</h3>
+                        <p id="reschedule-subtitle" class="text-[11px] text-slate-500">تعديل التاريخ أو الوقت مع الحفاظ على المدة</p>
+                    </div>
+                    <button onclick="closeModal('reschedule-modal')" class="w-8 h-8 rounded-xl bg-ivory text-navy font-bold">✕</button>
+                </div>
+
+                <div id="reschedule-error-box" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-extrabold"></div>
+
+                <form onsubmit="handleRescheduleSubmit(event)" class="space-y-3">
+                    <input type="hidden" id="reschedule-id">
+                    <div>
+                        <label class="block text-xs font-bold text-navy mb-1">التاريخ الجديد</label>
+                        <input type="date" id="reschedule-date" required class="w-full px-3.5 py-2.5 rounded-xl bg-ivory border border-slate-200 text-xs font-bold text-navy outline-none focus:border-cyanbrand">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-navy mb-1">الوقت الجديد (HH:MM)</label>
+                        <input type="time" id="reschedule-time" required class="w-full px-3.5 py-2.5 rounded-xl bg-ivory border border-slate-200 text-xs font-bold text-navy outline-none focus:border-cyanbrand">
+                    </div>
+                    <button type="submit" class="w-full py-3 rounded-xl bg-navy hover:bg-navy-light text-white text-xs font-extrabold transition">
+                        حفظ الموعد الجديد
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== 3. شاشة تأكيد الحجز والتذكرة (Confirmation + QR) ==================== -->
+        <div id="ticket-modal" class="hidden absolute inset-0 z-50 bg-navy/70 backdrop-blur-xs flex items-center justify-center p-5">
+            <div id="ticket-modal-body" class="bg-white w-full rounded-3xl overflow-hidden shadow-2xl border border-slate-200 tab-view">
+                <!-- يتم التعبئة ديناميكياً -->
+            </div>
+        </div>
+
+        <!-- ==================== 4. نافذة التنبيه التلقائي عند وصول الموعد (checkDue في C++) ==================== -->
+        <div id="due-alert-modal" class="hidden absolute inset-0 z-50 bg-navy/80 backdrop-blur-xs flex items-center justify-center p-5">
+            <div class="bg-white w-full rounded-3xl overflow-hidden shadow-2xl border-2 border-cyanbrand tab-view">
+                <div class="bg-navy text-white p-4 text-center">
+                    <span class="inline-block px-3 py-1 rounded-full bg-cyanbrand text-white text-[11px] font-extrabold animate-bounce mb-1">
+                        🔔 تنبيه وصول موعد
+                    </span>
+                    <h3 id="due-alert-title" class="text-base font-extrabold">حان موعد المريض الآن!</h3>
+                </div>
+                <div id="due-alert-details" class="p-5 space-y-4">
+                    <!-- تفاصيل الموعد وأزرار: 1) حضر المريض  2) تأجيل الموعد  3) إلغاء الموعد -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 5. نافذة تأكيد الإلغاء (بديل confirm) ==================== -->
+        <div id="cancel-confirm-modal" class="hidden absolute inset-0 z-50 bg-navy/70 backdrop-blur-xs flex items-center justify-center p-5">
+            <div class="bg-white w-full rounded-3xl p-5 shadow-2xl border border-slate-200 text-center space-y-4 tab-view">
+                <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl mx-auto">⚠️</div>
+                <div>
+                    <h3 class="text-base font-extrabold text-navy">تأكيد إلغاء الموعد</h3>
+                    <p id="cancel-confirm-text" class="text-xs text-slate-600 mt-1">هل أنت متأكد من إلغاء هذا الموعد؟</p>
+                </div>
+                <div class="grid grid-cols-2 gap-2.5 pt-1">
+                    <button id="confirm-cancel-btn" class="py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold transition">
+                        نعم، إلغاء الموعد
+                    </button>
+                    <button onclick="closeModal('cancel-confirm-modal')" class="py-2.5 rounded-xl bg-ivory hover:bg-slate-200 text-navy text-xs font-extrabold transition">
+                        تراجع
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- إشعار منبثق (Toast) -->
+        <div id="toast" class="pointer-events-none opacity-0 transition-all duration-300 absolute bottom-24 left-1/2 -translate-x-1/2 bg-navy text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-xl border border-white/10 whitespace-nowrap z-50">
+            تمت العملية بنجاح
+        </div>
+
+    </div>
+
+    <script>
+        // ==================== الثوابت والبيانات المطابقة لملف C++ ====================
+        const DOCTORS = [
+            { name: "د. سارة العلي", dept: "الباطنية", initials: "س ع" },
+            { name: "د. أحمد الكريم", dept: "الأطفال", initials: "أ ك" },
+            { name: "د. ليلى حسن", dept: "النساء والولادة", initials: "ل ح" },
+            { name: "د. خالد صالح", dept: "العظام", initials: "خ ص" }
+        ];
+
+        const VISIT_TYPES = [
+            { name: "كشف جديد", minutes: 30 },
+            { name: "مراجعة", minutes: 15 },
+            { name: "استشارة", minutes: 20 }
+        ];
+
+        const DAY_START = 8 * 60;   // 08:00 (480 دقيقة)
+        const DAY_END = 20 * 60;    // 20:00 (1200 دقيقة)
+        const STORAGE_KEY = "hosdate_bookings_v1";
+
+        let bookings = [];
+        let nextId = 1;
+        let alertedIds = new Set(); // مواعيد تم التنبيه عنها في هذه الجلسة (alerted في C++)
+        let selectedVisitTypeIndex = 0;
+        let currentAptFilter = "upcoming";
+
+        // ==================== أدوات الوقت والتاريخ (مطابقة لدوال C++) ====================
+
+        // fmt(int m): تحويل الدقائق من منتصف الليل إلى "HH:MM"
+        function fmt(m) {
+            const h = Math.floor(m / 60);
+            const min = m % 60;
+            return String(h).padStart(2, '0') + ":" + String(min).padStart(2, '0');
+        }
+
+        // toMinutes(string t): تحويل "HH:MM" إلى دقائق من منتصف الليل
+        function toMinutes(t) {
+            if (!t || !t.includes(':')) return -1;
+            const parts = t.split(':');
+            const h = parseInt(parts[0], 10);
+            const m = parseInt(parts[1], 10);
+            if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) return -1;
+            return h * 60 + m;
+        }
+
+        // todayString(): تاريخ اليوم بصيغة YYYY-MM-DD حسب التوقيت المحلي
+        function todayString() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        // فحص هل التاريخ صالح وإرجاع كائن Date
+        function parseDateObj(dateStr) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return null;
+            const [y, m, d] = dateStr.split('-').map(Number);
+            const dt = new Date(y, m - 1, d, 12, 0, 0);
+            if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+            return dt;
+        }
+
+        // isFriday(date): يوم الجمعة = 5 في JavaScript (0 الأحد .. 5 الجمعة .. 6 السبت)
+        function isFriday(dateStr) {
+            const dt = parseDateObj(dateStr);
+            return dt ? dt.getDay() === 5 : false;
+        }
+
+        // toTimestamp(date, startMin): تحويل التاريخ والدقائق إلى طابع زمني بالمللي ثانية
+        function toTimestamp(dateStr, startMin) {
+            const [y, m, d] = dateStr.split('-').map(Number);
+            const h = Math.floor(startMin / 60);
+            const min = startMin % 60;
+            return new Date(y, m - 1, d, h, min, 0).getTime();
+        }
+
+        // daysLabel(b): اليوم / غداً / بعد يومين / بعد X أيام / انتهى
+        function daysLabel(b) {
+            const now = Date.now();
+            if (toTimestamp(b.date, b.start) < now) return "انتهى";
+
+            const [y, m, d] = b.date.split('-').map(Number);
+            const d0 = new Date(y, m - 1, d, 12, 0, 0).getTime();
+
+            const [ty, tm, td] = todayString().split('-').map(Number);
+            const t0 = new Date(ty, tm - 1, td, 12, 0, 0).getTime();
+
+            const n = Math.round((d0 - t0) / 86400000);
+            if (n <= 0) return "اليوم";
+            if (n === 1) return "غداً";
+            if (n === 2) return "بعد يومين";
+            if (n <= 10) return `بعد ${n} أيام`;
+            return `بعد ${n} يوماً`;
+        }
+
+        // countdownText(targetMs): "3 يوم 02:15:30"
+        function countdownText(targetMs) {
+            let s = Math.floor((targetMs - Date.now()) / 1000);
+            if (s < 0) s = 0;
+            const d = Math.floor(s / 86400); s %= 86400;
+            const h = Math.floor(s / 3600);  s %= 3600;
+            const m = Math.floor(s / 60);    s %= 60;
+            return `${d} يوم ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function deptOf(doctorName) {
+            const doc = DOCTORS.find(d => d.name === doctorName);
+            return doc ? doc.dept : "";
+        }
+
+        // إيجاد أقرب يوم عمل قادم (غير الجمعة) للبيانات الافتراضية
+        function getNextWorkingDay(offsetDays = 1) {
+            const dt = new Date();
+            dt.setDate(dt.getDate() + offsetDays);
+            if (dt.getDay() === 5) dt.setDate(dt.getDate() + 1); // تجاوز الجمعة
+            const y = dt.getFullYear();
+            const m = String(dt.getMonth() + 1).padStart(2, '0');
+            const d = String(dt.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        // ==================== الحفظ والتحميل في localStorage ====================
+        function saveBookings() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+        }
+
+        function loadBookings() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try {
+                    bookings = JSON.parse(raw);
+                    bookings.forEach(b => {
+                        if (b.id >= nextId) nextId = b.id + 1;
+                    });
+                    return;
+                } catch (e) {}
+            }
+
+            // بيانات أولية تجريبية في المستقبل عند التشغيل لأول مرة
+            const day1 = getNextWorkingDay(1);
+            const day2 = getNextWorkingDay(2);
+            bookings = [
+                {
+                    id: 1,
+                    patient: "أحمد كاظم الساعدي",
+                    phone: "07701234567",
+                    doctor: "د. سارة العلي",
+                    type: "كشف جديد",
+                    date: day1,
+                    start: 10 * 60,       // 10:00
+                    end: 10 * 60 + 30     // 10:30
+                },
+                {
+                    id: 2,
+                    patient: "زهراء محمود علي",
+                    phone: "07809876543",
+                    doctor: "د. أحمد الكريم",
+                    type: "مراجعة",
+                    date: day1,
+                    start: 11 * 60 + 15,  // 11:15
+                    end: 11 * 60 + 30     // 11:30
+                },
+                {
+                    id: 3,
+                    patient: "أحمد كاظم الساعدي",
+                    phone: "07701234567",
+                    doctor: "د. خالد صالح",
+                    type: "استشارة",
+                    date: day2,
+                    start: 16 * 60,       // 16:00
+                    end: 16 * 60 + 20     // 16:20
+                }
+            ];
+            nextId = 4;
+            saveBookings();
+        }
+
+        // ==================== منطق التحقق الأساسي (مطابق 100% لـ C++) ====================
+
+        // findConflict: فحص تعارض المواعيد لنفس الطبيب في نفس اليوم
+        function findConflict(doctor, date, start, end, ignoreId) {
+            return bookings.find(b =>
+                b.id !== ignoreId &&
+                b.doctor === doctor &&
+                b.date === date &&
+                start < b.end &&
+                end > b.start
+            ) || null;
+        }
+
+        // checkSlot: يرجع "" إذا كان الموعد مقبولاً، أو رسالة الخطأ الدقيقة
+        function checkSlot(doctor, date, start, end, ignoreId) {
+            if (!parseDateObj(date)) return "صيغة التاريخ غير صحيحة.";
+            if (isFriday(date)) return "يوم الجمعة إجازة رسمية في المستشفى.";
+            if (start < DAY_START || end > DAY_END) return "خارج ساعات الدوام الرسمي (08:00 - 20:00).";
+            if (toTimestamp(date, start) <= Date.now()) return "يجب اختيار وقت في المستقبل.";
+
+            const conflict = findConflict(doctor, date, start, end, ignoreId);
+            if (conflict) {
+                return `الطبيب لديه موعد متعارض بهذا الوقت: ${conflict.patient} (${fmt(conflict.start)} - ${fmt(conflict.end)}).`;
+            }
+            return "";
+        }
+
+        // ==================== التهيئة الأولية والعداد المباشر ====================
+        document.addEventListener("DOMContentLoaded", () => {
+            loadBookings();
+
+            // مواعيد انتهت قبل التشغيل لا يتم التنبيه عنها (مطابق لـ main في C++)
+            const now = Date.now();
+            bookings.forEach(b => {
+                if (toTimestamp(b.date, b.end) < now) {
+                    alertedIds.add(b.id);
+                }
+            });
+
+            populateBookingSelects();
+            renderDoctorsCards();
+            renderNextAppointmentCard();
+            setScheduleToday();
+            renderAllAppointments();
+            renderQuickPhones();
+
+            // حلقة التحديث كل ثانية للعد التنازلي وفحص checkDue
+            setInterval(() => {
+                updateLiveCountdowns();
+                checkDue();
+            }, 1000);
+        });
+
+        function enterApp() {
+            const splash = document.getElementById("splash-screen");
+            splash.classList.add("opacity-0", "pointer-events-none");
+            setTimeout(() => splash.classList.add("hidden"), 500);
+            checkDue();
+        }
+
+        function toggleFullView() {
+            const container = document.getElementById("phone-container");
+            container.classList.toggle("sm:w-[430px]");
+            container.classList.toggle("sm:w-[780px]");
+            showToast("تم تبديل حجم عرض الواجهة");
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll(".tab-view").forEach(el => {
+                if (!el.closest("#booking-modal") && !el.closest("#reschedule-modal") &&
+                    !el.closest("#ticket-modal") && !el.closest("#due-alert-modal") &&
+                    !el.closest("#cancel-confirm-modal")) {
+                    el.classList.add("hidden");
+                }
+            });
+            document.getElementById(`view-${tabName}`).classList.remove("hidden");
+
+            document.querySelectorAll(".nav-item").forEach(btn => {
+                if (btn.dataset.nav === tabName) {
+                    btn.classList.add("text-cyanbrand", "active");
+                    btn.classList.remove("text-navy/60");
+                } else {
+                    btn.classList.remove("text-cyanbrand", "active");
+                    btn.classList.add("text-navy/60");
+                }
+            });
+
+            if (tabName === "schedule") renderDaySchedule();
+            if (tabName === "appointments") renderAllAppointments();
+            if (tabName === "history") renderQuickPhones();
+
+            document.getElementById("main-scroll").scrollTop = 0;
+        }
+
+        // ==================== عرض الموعد القادم والعد التنازلي المباشر ====================
+        function getUpcomingBookings() {
+            const now = Date.now();
+            return bookings
+                .filter(b => toTimestamp(b.date, b.start) > now)
+                .sort((a, b) => toTimestamp(a.date, a.start) - toTimestamp(b.date, b.start));
+        }
+
+        function renderNextAppointmentCard() {
+            const wrapper = document.getElementById("next-appointment-wrapper");
+            const upcoming = getUpcomingBookings();
+
+            if (upcoming.length === 0) {
+                wrapper.innerHTML = `
+                    <div class="rounded-3xl bg-navy text-white p-5 shadow-xl shadow-navy/20 text-center space-y-3">
+                        <p class="text-xs text-cyanbrand font-bold">لا توجد مواعيد قادمة حالياً</p>
+                        <h2 class="text-base font-extrabold">احجز موعدك الطبي بكل سهولة</h2>
+                        <button onclick="openBookingModal()" class="px-5 py-2.5 rounded-xl bg-cyanbrand hover:bg-cyanbrand-dark text-white text-xs font-extrabold transition">
+                            + حجز موعد جديد الآن
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const next = upcoming[0];
+            const targetMs = toTimestamp(next.date, next.start);
+
+            wrapper.innerHTML = `
+                <div class="rounded-3xl bg-navy text-white p-5 shadow-xl shadow-navy/20 relative overflow-hidden">
+                    <div class="absolute -left-8 -top-8 w-32 h-32 rounded-full bg-cyanbrand/15 blur-xl"></div>
+                    <div class="absolute -right-8 -bottom-10 w-28 h-28 rounded-full bg-cyanbrand/10 blur-lg"></div>
+
+                    <div class="flex items-center justify-between mb-3 relative z-10">
+                        <span class="px-3 py-1 rounded-full bg-cyanbrand/20 text-cyanbrand text-[11px] font-bold border border-cyanbrand/30">
+                            الموعد القادم • #${next.id}
+                        </span>
+                        <span class="px-2.5 py-0.5 rounded-lg bg-white/10 text-emerald-300 text-[11px] font-extrabold">
+                            ${daysLabel(next)}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-3.5 relative z-10">
+                        <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-cyanbrand font-extrabold text-base shrink-0">
+                            ${next.doctor.slice(0, 4)}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h2 class="text-base font-extrabold truncate">${next.patient}</h2>
+                            <p class="text-xs text-slate-300 truncate">${next.doctor} (${deptOf(next.doctor)}) • ${next.type}</p>
+                        </div>
+                    </div>
+
+                    <!-- شريط العد التنازلي المباشر بالثواني -->
+                    <div class="p-3 rounded-2xl bg-navy-light/95 border border-white/10 mb-3.5 relative z-10 flex items-center justify-between">
+                        <div>
+                            <span class="block text-[10px] text-slate-400">الموعد</span>
+                            <span class="text-xs font-bold">${next.date} | ${fmt(next.start)} - ${fmt(next.end)}</span>
+                        </div>
+                        <div class="text-left">
+                            <span class="block text-[10px] text-slate-400">المتبقي</span>
+                            <span id="hero-live-countdown" data-target="${targetMs}" dir="ltr" class="text-xs font-black text-cyanbrand font-mono">
+                                ${countdownText(targetMs)}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 relative z-10">
+                        <button onclick="showTicketModal(${next.id})" class="py-2 rounded-xl bg-cyanbrand hover:bg-cyanbrand-dark text-white text-xs font-bold transition active:scale-95">
+                            التذكرة QR
+                        </button>
+                        <button onclick="openRescheduleModal(${next.id})" class="py-2 rounded-xl bg-white text-navy hover:bg-slate-100 text-xs font-bold transition active:scale-95">
+                            تأجيل
+                        </button>
+                        <button onclick="askCancelAppointment(${next.id})" class="py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 text-xs font-bold transition active:scale-95">
+                            إلغاء
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateLiveCountdowns() {
+            // تحديث الساعة في شريط الحالة
+            const now = new Date();
+            const clockEl = document.getElementById("status-bar-clock");
+            if (clockEl) {
+                clockEl.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            }
+
+            // تحديث جميع العدادات التنازلية في الصفحة
+            document.querySelectorAll("[data-target]").forEach(el => {
+                const targetMs = Number(el.getAttribute("data-target"));
+                if (targetMs > Date.now()) {
+                    el.textContent = countdownText(targetMs);
+                } else {
+                    el.textContent = "حان الموعد";
+                }
+            });
+        }
+
+        // ==================== عرض أطباء المستشفى ====================
+        function renderDoctorsCards() {
+            const container = document.getElementById("doctors-cards-container");
+            container.innerHTML = DOCTORS.map(doc => {
+                const count = bookings.filter(b => b.doctor === doc.name && toTimestamp(b.date, b.start) > Date.now()).length;
+                return `
+                    <div class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-xl bg-navy text-white font-extrabold text-xs flex items-center justify-center border-b-2 border-cyanbrand shrink-0">
+                                ${doc.initials}
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-extrabold text-navy">${doc.name}</h4>
+                                <p class="text-xs font-semibold text-cyanbrand">قسم ${doc.dept}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold text-slate-400 bg-ivory px-2 py-1 rounded-lg">${count} قادم</span>
+                            <button onclick="openBookingWithDoctor('${doc.name}')" class="px-3 py-2 rounded-xl bg-navy hover:bg-navy-light text-white text-xs font-bold transition active:scale-95">
+                                حجز
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==================== العملية 1: حجز موعد جديد (bookAppointment) ====================
+        function populateBookingSelects() {
+            const docSelect = document.getElementById("book-doctor");
+            docSelect.innerHTML = DOCTORS.map(d =>
+                `<option value="${d.name}">${d.name} — قسم ${d.dept}</option>`
+            ).join('');
+
+            renderVisitTypesButtons();
+        }
+
+        function renderVisitTypesButtons() {
+            const grid = document.getElementById("visit-types-grid");
+            grid.innerHTML = VISIT_TYPES.map((vt, idx) => {
+                const active = idx === selectedVisitTypeIndex;
+                return `
+                    <button type="button" onclick="selectVisitType(${idx})" class="p-2.5 rounded-xl border text-center transition ${
+                        active ? 'bg-navy text-white border-navy shadow-xs' : 'bg-ivory text-navy border-slate-200 hover:border-cyanbrand'
+                    }">
+                        <span class="block text-xs font-extrabold">${vt.name}</span>
+                        <span class="block text-[10px] ${active ? 'text-cyanbrand' : 'text-slate-500'} font-bold mt-0.5">${vt.minutes} دقيقة</span>
+                    </button>
+                `;
+            }).join('');
+            updateCalculatedEndTime();
+        }
+
+        function selectVisitType(idx) {
+            selectedVisitTypeIndex = idx;
+            renderVisitTypesButtons();
+        }
+
+        function updateCalculatedEndTime() {
+            const timeVal = document.getElementById("book-time").value;
+            const startMin = toMinutes(timeVal);
+            const dur = VISIT_TYPES[selectedVisitTypeIndex].minutes;
+            const preview = document.getElementById("calculated-slot-preview");
+
+            if (startMin >= 0) {
+                const endMin = startMin + dur;
+                preview.textContent = `${fmt(startMin)} - ${fmt(endMin)} (${dur} دقيقة)`;
+            } else {
+                preview.textContent = "اختر وقتاً صحيحاً";
+            }
+        }
+
+        function openBookingModal() {
+            document.getElementById("booking-error-box").classList.add("hidden");
+            const dateInput = document.getElementById("book-date");
+            if (!dateInput.value) {
+                dateInput.value = getNextWorkingDay(1);
+            }
+            updateCalculatedEndTime();
+            document.getElementById("booking-modal").classList.remove("hidden");
+        }
+
+        function openBookingWithDoctor(doctorName) {
+            openBookingModal();
+            document.getElementById("book-doctor").value = doctorName;
+        }
+
+        function handleBookSubmit(e) {
+            e.preventDefault();
+            const errBox = document.getElementById("booking-error-box");
+            errBox.classList.add("hidden");
+
+            const patient = document.getElementById("book-patient").value.trim().replace(/\|/g, ' ');
+            const phone = document.getElementById("book-phone").value.trim();
+            const doctor = document.getElementById("book-doctor").value;
+            const visitType = VISIT_TYPES[selectedVisitTypeIndex];
+            const date = document.getElementById("book-date").value;
+            const timeStr = document.getElementById("book-time").value;
+
+            // التحقق من الاسم
+            if (!patient) {
+                showBookingError("اكتب اسم المريض.");
+                return;
+            }
+
+            // التحقق من رقم الجوال (10 أو 11 رقماً فقط)
+            if (!/^\d{10,11}$/.test(phone)) {
+                showBookingError("رقم الجوال غير صحيح (يجب أن يتكون من 10 أو 11 رقماً).");
+                return;
+            }
+
+            const start = toMinutes(timeStr);
+            if (start < 0) {
+                showBookingError("صيغة الوقت غير صحيحة.");
+                return;
+            }
+            const end = start + visitType.minutes;
+
+            // فحص القواعد (الجمعة، الدوام، الماضي، التعارض)
+            const slotErr = checkSlot(doctor, date, start, end, -1);
+            if (slotErr) {
+                showBookingError(slotErr);
+                return;
+            }
+
+            // حساب عدد الزيارات السابقة لهذا الرقم
+            const previousVisits = bookings.filter(b => b.phone === phone).length;
+
+            const newBooking = {
+                id: nextId++,
+                patient,
+                phone,
+                doctor,
+                type: visitType.name,
+                date,
+                start,
+                end
+            };
+
+            bookings.push(newBooking);
+            saveBookings();
+
+            closeModal("booking-modal");
+            document.getElementById("book-patient").value = "";
+            document.getElementById("book-phone").value = "";
+
+            refreshAllViews();
+            showTicketModal(newBooking.id, previousVisits);
+            showToast("✓ تم حجز موعدك بنجاح");
+        }
+
+        function showBookingError(msg) {
+            const errBox = document.getElementById("booking-error-box");
+            errBox.textContent = "⚠️ " + msg;
+            errBox.classList.remove("hidden");
+        }
+
+        // ==================== العملية 2: عرض مواعيد يوم (listDay) ====================
+        function setScheduleToday() {
+            document.getElementById("schedule-date-input").value = todayString();
+            renderDaySchedule();
+        }
+
+        function renderDaySchedule() {
+            const dateStr = document.getElementById("schedule-date-input").value || todayString();
+            const fridayBanner = document.getElementById("friday-banner");
+            const container = document.getElementById("day-schedule-container");
+
+            if (isFriday(dateStr)) {
+                fridayBanner.classList.remove("hidden");
+            } else {
+                fridayBanner.classList.add("hidden");
+            }
+
+            const dayRows = bookings
+                .filter(b => b.date === dateStr)
+                .sort((a, b) => a.start - b.start);
+
+            if (dayRows.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center rounded-3xl bg-white border border-slate-200/80 space-y-2">
+                        <p class="text-sm font-extrabold text-navy">لا توجد مواعيد في يوم ${dateStr}</p>
+                        <button onclick="openBookingModal()" class="text-xs font-bold text-cyanbrand">+ إضافة حجز لهذا اليوم</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // تجميع المواعيد حسب كل طبيب وقسمه كما في C++
+            let html = "";
+            DOCTORS.forEach(doc => {
+                const docBookings = dayRows.filter(b => b.doctor === doc.name);
+                if (docBookings.length === 0) return;
+
+                html += `
+                    <div class="bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-2xs">
+                        <div class="px-4 py-3 bg-navy text-white flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-cyanbrand font-extrabold">[قسم ${doc.dept}]</span>
+                                <h4 class="text-sm font-extrabold">${doc.name}</h4>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-lg bg-white/10 text-xs font-bold">${docBookings.length} موعد</span>
+                        </div>
+                        <div class="divide-y divide-slate-100">
+                            ${docBookings.map(b => `
+                                <div class="p-3.5 flex items-center justify-between gap-2">
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-black text-cyanbrand">#${b.id}</span>
+                                            <span class="text-xs font-extrabold text-navy truncate">${b.patient}</span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 mt-0.5">
+                                            ${b.type} • <span dir="ltr">${b.phone}</span>
+                                        </p>
+                                    </div>
+                                    <div class="text-left shrink-0">
+                                        <span dir="ltr" class="block text-xs font-black text-navy">${fmt(b.start)} - ${fmt(b.end)}</span>
+                                        <span class="inline-block mt-0.5 px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                                            daysLabel(b) === 'انتهى' ? 'bg-slate-100 text-slate-500' : 'bg-cyanbrand-light text-cyanbrand'
+                                        }">${daysLabel(b)}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ==================== العملية 3 و 4: عرض الكل + التأجيل + الإلغاء ====================
+        function setAptFilter(filter, btnEl) {
+            currentAptFilter = filter;
+            document.querySelectorAll(".apt-filter-btn").forEach(btn => {
+                btn.className = "apt-filter-btn py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition";
+            });
+            btnEl.className = "apt-filter-btn py-2 rounded-xl text-xs font-bold bg-navy text-white transition";
+            renderAllAppointments();
+        }
+
+        function renderAllAppointments() {
+            document.getElementById("total-bookings-badge").textContent = bookings.length;
+            const container = document.getElementById("all-appointments-list");
+            const now = Date.now();
+
+            let list = [...bookings].sort((a, b) => toTimestamp(a.date, a.start) - toTimestamp(b.date, b.start));
+            if (currentAptFilter === "upcoming") {
+                list = list.filter(b => toTimestamp(b.date, b.start) > now);
+            }
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center rounded-3xl bg-white border border-slate-200/80 space-y-2">
+                        <p class="text-sm font-bold text-navy">لا توجد مواعيد مطابقة</p>
+                        <button onclick="openBookingModal()" class="text-xs font-bold text-cyanbrand">+ حجز موعد جديد</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = list.map(b => {
+                const targetMs = toTimestamp(b.date, b.start);
+                const isPast = targetMs <= now;
+                return `
+                    <div class="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-2xs space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black text-navy">#${b.id} • ${b.patient}</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                                isPast ? 'bg-slate-100 text-slate-500' : 'bg-cyanbrand-light text-cyanbrand'
+                            }">${daysLabel(b)}</span>
+                        </div>
+
+                        <div class="text-xs text-slate-600">
+                            <p class="font-bold text-navy">${b.doctor} <span class="text-cyanbrand">(${deptOf(b.doctor)})</span> — ${b.type}</p>
+                            <p class="text-[11px] text-slate-500 mt-0.5">الجوال: <span dir="ltr">${b.phone}</span></p>
+                        </div>
+
+                        <div class="flex items-center justify-between p-2.5 rounded-xl bg-ivory text-xs">
+                            <span class="font-bold text-navy">📅 ${b.date} | <span dir="ltr">${fmt(b.start)} - ${fmt(b.end)}</span></span>
+                            ${!isPast ? `<span data-target="${targetMs}" dir="ltr" class="font-mono font-extrabold text-cyanbrand text-[11px]">${countdownText(targetMs)}</span>` : ''}
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-0.5">
+                            <button onclick="showTicketModal(${b.id})" class="px-3 py-2 rounded-xl bg-ivory hover:bg-slate-200 text-navy text-xs font-bold transition">
+                                التذكرة
+                            </button>
+                            <button onclick="openRescheduleModal(${b.id})" class="flex-1 py-2 rounded-xl bg-navy hover:bg-navy-light text-white text-xs font-bold transition">
+                                تأجيل الموعد
+                            </button>
+                            <button onclick="askCancelAppointment(${b.id})" class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition">
+                                إلغاء
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // فتح نافذة التأجيل (reschedule في C++)
+        function openRescheduleModal(id) {
+            const b = bookings.find(item => item.id === id);
+            if (!b) return;
+
+            document.getElementById("reschedule-error-box").classList.add("hidden");
+            document.getElementById("reschedule-id").value = b.id;
+            document.getElementById("reschedule-subtitle").textContent = `${b.patient} — ${b.doctor} (المدة: ${b.end - b.start} دقيقة)`;
+            document.getElementById("reschedule-date").value = b.date;
+            document.getElementById("reschedule-time").value = fmt(b.start);
+            document.getElementById("reschedule-modal").classList.remove("hidden");
+        }
+
+        function handleRescheduleSubmit(e) {
+            e.preventDefault();
+            const id = Number(document.getElementById("reschedule-id").value);
+            const b = bookings.find(item => item.id === id);
+            if (!b) return;
+
+            const newDate = document.getElementById("reschedule-date").value;
+            const newStart = toMinutes(document.getElementById("reschedule-time").value);
+            const errBox = document.getElementById("reschedule-error-box");
+            errBox.classList.add("hidden");
+
+            if (newStart < 0) {
+                errBox.textContent = "⚠️ صيغة الوقت غير صحيحة.";
+                errBox.classList.remove("hidden");
+                return;
+            }
+
+            const duration = b.end - b.start; // الحفاظ على نفس مدة الموعد الأصلي
+            const newEnd = newStart + duration;
+
+            const slotErr = checkSlot(b.doctor, newDate, newStart, newEnd, b.id);
+            if (slotErr) {
+                errBox.textContent = "⚠️ " + slotErr;
+                errBox.classList.remove("hidden");
+                return;
+            }
+
+            b.date = newDate;
+            b.start = newStart;
+            b.end = newEnd;
+            alertedIds.delete(b.id); // ينبه من جديد عند الموعد الجديد
+            saveBookings();
+
+            closeModal("reschedule-modal");
+            refreshAllViews();
+            showToast(`تم تأجيل موعد ${b.patient} إلى ${b.date} الساعة ${fmt(b.start)}`);
+        }
+
+        // إلغاء موعد مع نافذة تأكيد مخصصة
+        function askCancelAppointment(id) {
+            const b = bookings.find(item => item.id === id);
+            if (!b) return;
+
+            document.getElementById("cancel-confirm-text").textContent =
+                `هل أنت متأكد من إلغاء موعد المريض (${b.patient}) بتاريخ ${b.date} الساعة ${fmt(b.start)}؟`;
+
+            const btn = document.getElementById("confirm-cancel-btn");
+            btn.onclick = () => {
+                bookings = bookings.filter(item => item.id !== id);
+                saveBookings();
+                closeModal("cancel-confirm-modal");
+                refreshAllViews();
+                showToast(`تم إلغاء موعد ${b.patient}`);
+            };
+
+            document.getElementById("cancel-confirm-modal").classList.remove("hidden");
+        }
+
+        // ==================== العملية 5: سجل المريض (patientHistory) ====================
+        function renderQuickPhones() {
+            const bar = document.getElementById("quick-phones-bar");
+            const uniquePhones = [...new Set(bookings.map(b => b.phone))];
+            bar.innerHTML = uniquePhones.map(ph => `
+                <button type="button" onclick="document.getElementById('history-phone-input').value='${ph}'; searchPatientHistory();"
+                    class="px-2.5 py-1 rounded-lg bg-ivory hover:bg-cyanbrand-light text-navy hover:text-cyanbrand text-[11px] font-bold border border-slate-200 transition" dir="ltr">
+                    ${ph}
+                </button>
+            `).join('');
+        }
+
+        function searchPatientHistory() {
+            const phone = document.getElementById("history-phone-input").value.trim();
+            const container = document.getElementById("patient-history-results");
+
+            if (!phone) {
+                showToast("أدخل رقم جوال المريض أولاً");
+                return;
+            }
+
+            const rows = bookings
+                .filter(b => b.phone === phone)
+                .sort((a, b) => a.date !== b.date ? a.date.localeCompare(b.date) : a.start - b.start);
+
+            if (rows.length === 0) {
+                container.innerHTML = `
+                    <div class="p-6 text-center rounded-3xl bg-white border border-slate-200/80 text-xs font-bold text-rose-600">
+                        لا توجد زيارات مسجلة لهذا الرقم (${phone}).
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="p-4 rounded-2xl bg-navy text-white flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] text-cyanbrand font-bold">ملف المريض</span>
+                        <h3 class="text-base font-extrabold">${rows[0].patient}</h3>
+                    </div>
+                    <div class="text-center bg-white/10 px-3.5 py-1.5 rounded-xl">
+                        <span class="block text-lg font-black text-cyanbrand leading-none">${rows.length}</span>
+                        <span class="text-[10px] text-slate-300">عدد الزيارات</span>
+                    </div>
+                </div>
+                <div class="space-y-2.5">
+                    ${rows.map(b => `
+                        <div class="p-3.5 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-extrabold text-navy">${b.doctor} <span class="text-cyanbrand">(${deptOf(b.doctor)})</span></p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">${b.date} • ${fmt(b.start)} - ${fmt(b.end)} • ${b.type}</p>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${
+                                daysLabel(b) === 'انتهى' ? 'bg-slate-100 text-slate-600' : 'bg-cyanbrand-light text-cyanbrand'
+                            }">${daysLabel(b)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // ==================== شاشة تأكيد الحجز والتذكرة (Confirmation + QR) ====================
+        function showTicketModal(id, previousVisits = null) {
+            const b = bookings.find(item => item.id === id);
+            if (!b) return;
+
+            const targetMs = toTimestamp(b.date, b.start);
+            const visitsText = previousVisits !== null
+                ? (previousVisits === 0 ? "أول زيارة" : `${previousVisits} زيارة سابقة`)
+                : `${bookings.filter(item => item.phone === b.phone).length} إجمالي الزيارات`;
+
+            const body = document.getElementById("ticket-modal-body");
+            body.innerHTML = `
+                <div class="bg-navy text-white p-5 text-center relative">
+                    <button onclick="closeModal('ticket-modal')" class="absolute top-4 left-4 w-8 h-8 rounded-xl bg-white/10 text-white text-xs font-bold">✕</button>
+                    <div dir="ltr" class="inline-flex items-baseline gap-1 text-xl font-black">
+                        <span>hos</span><span class="text-cyanbrand">date</span>
+                    </div>
+                    <p class="text-xs text-emerald-400 font-extrabold mt-1">✓ تذكرة حجز موعد طبي مؤكد</p>
+                </div>
+
+                <div class="p-5 space-y-3.5">
+                    <div class="grid grid-cols-2 gap-2 p-3 rounded-2xl bg-ivory text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block">المريض</span>
+                            <span class="font-extrabold text-navy">${b.patient}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block">الطبيب والقسم</span>
+                            <span class="font-extrabold text-cyanbrand">${b.doctor} (${deptOf(b.doctor)})</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block">التاريخ والوقت</span>
+                            <span class="font-bold text-navy">${b.date} | <span dir="ltr">${fmt(b.start)} - ${fmt(b.end)}</span></span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block">نوع الزيارة والسجل</span>
+                            <span class="font-bold text-navy">${b.type} • ${visitsText}</span>
+                        </div>
+                    </div>
+
+                    ${targetMs > Date.now() ? `
+                        <div class="p-2.5 rounded-xl bg-cyanbrand-light border border-cyanbrand/20 flex items-center justify-between text-xs">
+                            <span class="font-bold text-navy">المتبقي على الموعد (${daysLabel(b)}):</span>
+                            <span data-target="${targetMs}" dir="ltr" class="font-mono font-black text-cyanbrand">${countdownText(targetMs)}</span>
+                        </div>
+                    ` : ''}
+
+                    <div class="flex flex-col items-center justify-center py-1">
+                        <div class="p-2.5 rounded-2xl bg-white border-2 border-navy/15">
+                            <svg class="w-28 h-28 text-navy" viewBox="0 0 100 100" fill="currentColor">
+                                <path d="M10 10h25v25H10V10zm5 5v15h15V15H15zm5 5h5v5h-5v-5zm45-10h25v25H65V10zm5 5v15h15V15H70zm5 5h5v5h-5v-5zM10 65h25v25H10V65zm5 5v15h15V70H15zm5 5h5v5h-5v-5z"/>
+                                <path d="M42 10h6v10h-6V10zm10 5h6v15h-6V15zM42 28h10v6H42v-6zm-32 14h15v6H10v-6zm22 0h12v12H32V42zm18 0h10v6H50v-6zm16 0h24v6H66v-6zM42 54h16v6H42v-6zm24 6h12v12H66V60zm18 0h6v18h-6V60zM42 66h8v24h-8V66zm14 10h12v6H56v-6zm18 8h16v6H74v-6z"/>
+                                <rect x="44" y="44" width="12" height="12" rx="2" fill="#129AC3"/>
+                            </svg>
+                        </div>
+                        <span class="text-[11px] font-extrabold text-navy mt-1.5">رقم الحجز: #${b.id}</span>
+                    </div>
+
+                    <button onclick="closeModal('ticket-modal')" class="w-full py-3 rounded-xl bg-navy text-white text-xs font-extrabold hover:bg-navy-light transition">
+                        إغلاق التذكرة
+                    </button>
+                </div>
+            `;
+            document.getElementById("ticket-modal").classList.remove("hidden");
+        }
+
+        // ==================== نظام التنبيه التلقائي عند وصول الموعد (checkDue) ====================
+        function checkDue() {
+            // لا تفتح نافذة فوق نافذة مفتوحة حالياً
+            if (!document.getElementById("due-alert-modal").classList.contains("hidden")) return;
+
+            const now = Date.now();
+            for (let i = 0; i < bookings.length; i++) {
+                const b = bookings[i];
+                if (alertedIds.has(b.id)) continue;
+                if (toTimestamp(b.date, b.start) > now) continue; // لم يصل وقته بعد
+
+                alertedIds.add(b.id);
+                const ended = toTimestamp(b.date, b.end) <= now;
+                triggerDueModal(b, ended);
+                break;
+            }
+        }
+
+        function triggerDueModal(b, ended) {
+            document.getElementById("due-alert-title").textContent = ended ? "انتهى وقت موعد المريض!" : "حان موعد المريض الآن!";
+            document.getElementById("due-alert-details").innerHTML = `
+                <div class="p-3.5 rounded-2xl bg-ivory border border-slate-200 text-xs space-y-1">
+                    <p class="font-extrabold text-navy text-sm">#${b.id} — ${b.patient}</p>
+                    <p class="text-cyanbrand font-bold">${b.doctor} (${deptOf(b.doctor)}) • ${b.type}</p>
+                    <p class="text-slate-500">الوقت: ${b.date} (${fmt(b.start)} - ${fmt(b.end)}) | جوال: <span dir="ltr">${b.phone}</span></p>
+                </div>
+
+                <div class="space-y-2">
+                    <button onclick="handleDueAction(${b.id}, 'attended')" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold transition">
+                        1) حضر المريض (تسجيل الحضور)
+                    </button>
+                    <button onclick="handleDueAction(${b.id}, 'postpone')" class="w-full py-3 rounded-xl bg-navy hover:bg-navy-light text-white text-xs font-extrabold transition">
+                        2) تأجيل الموعد
+                    </button>
+                    <button onclick="handleDueAction(${b.id}, 'cancel')" class="w-full py-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-extrabold transition">
+                        3) إلغاء الموعد
+                    </button>
+                </div>
+            `;
+            document.getElementById("due-alert-modal").classList.remove("hidden");
+        }
+
+        function handleDueAction(id, action) {
+            const b = bookings.find(item => item.id === id);
+            closeModal("due-alert-modal");
+            if (!b) return;
+
+            if (action === "attended") {
+                showToast(`✓ تم تسجيل حضور المريض ${b.patient}`);
+                refreshAllViews();
+            } else if (action === "postpone") {
+                openRescheduleModal(id);
+            } else if (action === "cancel") {
+                bookings = bookings.filter(item => item.id !== id);
+                saveBookings();
+                refreshAllViews();
+                showToast(`تم إلغاء موعد ${b.patient}`);
+            }
+        }
+
+        // محاكاة وصول موعد الآن لاختبار ميزة checkDue مباشرة
+        function simulateDueAlert() {
+            const upcoming = getUpcomingBookings();
+            const sample = upcoming[0] || bookings[0];
+            if (!sample) {
+                showToast("لا توجد مواعيد للاختبار، احجز موعداً أولاً");
+                return;
+            }
+            triggerDueModal(sample, false);
+        }
+
+        // ==================== تحديث كافة الواجهات والمساعدات ====================
+        function refreshAllViews() {
+            renderNextAppointmentCard();
+            renderDoctorsCards();
+            renderDaySchedule();
+            renderAllAppointments();
+            renderQuickPhones();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add("hidden");
+        }
+
+        let toastTimer;
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.textContent = msg;
+            toast.classList.remove("opacity-0", "translate-y-2");
+            toast.classList.add("opacity-100", "translate-y-0");
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove("opacity-100", "translate-y-0");
+                toast.classList.add("opacity-0", "translate-y-2");
+            }, 2800);
+        }
+    </script>
+</body>
+</html>
